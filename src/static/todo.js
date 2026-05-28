@@ -5,6 +5,13 @@
 "use strict";
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+const REMINDER_CHECK_INTERVAL = 30000;   // ms between reminder polls
+const REMINDER_WINDOW_MS = 31000;        // fire reminder if within this window after due time
+const MAX_TAGS = 10;                     // maximum tags per todo item
+
+// ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
 let todos = [];          // array of todo objects from API
@@ -205,7 +212,7 @@ function buildCard(todo) {
 
   const timerRunning = !!(timers[todo.id]);
   const timerBtn = document.createElement("button");
-  timerBtn.className = "icon-btn" + (timerRunning ? " timer-running" : "");
+  timerBtn.className = "icon-btn timer-btn" + (timerRunning ? " timer-running" : "");
   timerBtn.title = timerRunning ? "停止计时" : "开始计时";
   timerBtn.textContent = timerRunning ? "⏸" : "▶";
   timerBtn.addEventListener("click", () => toggleTimer(todo.id));
@@ -306,10 +313,12 @@ function startTimer(id) {
     // Update timer button style
     const card = todoList.querySelector(`[data-id="${id}"]`);
     if (card) {
-      const btn = card.querySelector(".icon-btn");
-      btn.className = "icon-btn timer-running";
-      btn.title = "停止计时";
-      btn.textContent = "⏸";
+      const btn = card.querySelector(".icon-btn.timer-btn");
+      if (btn) {
+        btn.className = "icon-btn timer-btn timer-running";
+        btn.title = "停止计时";
+        btn.textContent = "⏸";
+      }
     }
   }, 1000);
   // Re-render the card to reflect running state immediately
@@ -496,7 +505,7 @@ function renderTagSuggestions() {
 
 function addModalTag(tag) {
   tag = tag.trim().replace(/,/g, "");
-  if (!tag || modalTags.includes(tag) || modalTags.length >= 10) return;
+  if (!tag || modalTags.includes(tag) || modalTags.length >= MAX_TAGS) return;
   modalTags.push(tag);
   renderModalChips();
   renderTagSuggestions();
@@ -538,13 +547,13 @@ function checkReminders() {
   todos.forEach(todo => {
     if (!todo.reminder || todo.completed || todo._reminded) return;
     const rd = new Date(todo.reminder);
-    // Fire if reminder is within the past 31 seconds (catches the 30-s poll gap)
-    if (rd <= now && (now - rd) < 31000) {
+    // Fire if reminder is within REMINDER_WINDOW_MS of the due time (catches the poll gap)
+    if (rd <= now && (now - rd) < REMINDER_WINDOW_MS) {
       todo._reminded = true;
       showToast(`⏰ 提醒：${todo.title}`, "warning", 8000);
       // Browser notification if permission granted
       if (Notification.permission === "granted") {
-        new Notification("备忘录提醒", { body: todo.title, icon: "" });
+        new Notification("备忘录提醒", { body: todo.title });
       }
     }
   });
@@ -642,4 +651,4 @@ document.addEventListener("keydown", e => {
 // Boot
 // ---------------------------------------------------------------------------
 loadTodos();
-reminderInterval = setInterval(checkReminders, 30000);
+reminderInterval = setInterval(checkReminders, REMINDER_CHECK_INTERVAL);
