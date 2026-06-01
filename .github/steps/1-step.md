@@ -40,7 +40,7 @@ Let's start up our development environment, use copilot to learn a bit about the
    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/{{full_repo_name}}?quickstart=1)
 
 1. Confirm the **Repository** field is your copy of the exercise, not the original, then click the green **Create Codespace** button.
-   - ✅ Your copy: `/{{full_repo_name}}`
+   - ✅ Your copy: `/liayu01/skills-getting-started-with-github-copilot`
    - ❌ Original: `/skills/getting-started-with-github-copilot`
 
 1. Wait a moment for Visual Studio Code to load in your browser.
