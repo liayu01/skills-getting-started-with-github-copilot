@@ -26,32 +26,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft = details.max_participants - details.participants.length;
-        const participantsMarkup = details.participants.length
-          ? `
-            <div class="participants-section">
-              <p><strong>Participants:</strong></p>
-              <ul class="participants-list">
-                ${details.participants
-                  .map(
-                    (participantEmail) => `
-                      <li class="participant-item">
-                        <span class="participant-email">${participantEmail}</span>
-                        <button
-                          class="participant-delete-btn"
-                          title="Unregister participant"
-                          aria-label="Unregister ${participantEmail}"
-                          data-activity="${encodeURIComponent(name)}"
-                          data-email="${encodeURIComponent(participantEmail)}"
-                        >🗑</button>
-                      </li>
-                    `
-                  )
-                  .join("")}
-              </ul>
-            </div>
-          `
-          : "<p><strong>Participants:</strong> None yet</p>";
+        const participants = Array.isArray(details.participants) ? details.participants : [];
+        const spotsLeft = details.max_participants - participants.length;
+        const participantsItems = participants
+          .map(
+            (participantEmail) => `
+              <li class="participant-item">
+                <span class="participant-email">${participantEmail}</span>
+                <button
+                  class="participant-delete-btn"
+                  title="Unregister participant"
+                  aria-label="Unregister ${participantEmail}"
+                  data-activity="${encodeURIComponent(name)}"
+                  data-email="${encodeURIComponent(participantEmail)}"
+                >🗑</button>
+              </li>
+            `
+          )
+          .join("");
+
+        const participantsMarkup = `
+          <div class="participants-section">
+            <p><strong>Participants:</strong></p>
+            ${participants.length
+              ? `<ul class="participants-list">${participantsItems}</ul>`
+              : '<p class="participants-empty">None yet</p>'}
+          </div>
+        `;
 
         activityCard.innerHTML = `
           <h4>${name}</h4>

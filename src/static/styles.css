@@ -84,6 +84,12 @@ section h3 {
   padding: 0;
 }
 
+.participants-empty {
+  margin: 6px 0 0;
+  color: #546e7a;
+  font-style: italic;
+}
+
 .participant-item {
   display: flex;
   align-items: center;
